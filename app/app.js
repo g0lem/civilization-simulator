@@ -7,6 +7,9 @@ import { remote } from 'electron'; // native electron module
 import jetpack from 'fs-jetpack'; // module loaded from npm
 import { greet } from './hello_world/hello_world'; // code authored by you in this project
 import env from './env';
+import world from './world_data/world';
+import textures from './world_data/textures';
+import spritesheets from './world_data/spritesheets';
 
 
 console.log('Loaded environment variables:', env);
@@ -24,10 +27,13 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'main', { preload: preload, cr
 
 function preload() {
 
-    game.load.image('sky', 'assets/sky.png');
-    game.load.image('ground', 'assets/platform.png');
-    game.load.image('star', 'assets/star.png');
-    game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+    textures.forEach(elm=>{
+        game.load.image(elm.name, elm.location, elm.width, elm.height);
+    });
+
+    spritesheets.forEach(elm=>{
+        game.load.spritesheet(elm.name, elm.location, elm.width, elm.height);
+    });
 
 }
 
@@ -54,7 +60,7 @@ function create() {
     platforms.enableBody = true;
 
     // Here we create the ground.
-    var ground = platforms.create(0, game.world.height - 64, 'ground');
+    var ground = platforms.create(0, game.world.height, 'ground');
 
     //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
     ground.scale.setTo(2, 2);
@@ -66,8 +72,14 @@ function create() {
     var ledge = platforms.create(400, 400, 'ground');
     ledge.body.immovable = true;
 
-    ledge = platforms.create(-150, 250, 'ground');
+    ledge = platforms.create(150, 250, 'ground');
     ledge.body.immovable = true;
+
+    world.forEach(elm=>{
+        let plat = platforms.create(elm.x, elm.y, elm.texture);
+        plat.body.immovable = true;
+        plat.scale.setTo(elm.scaleX, elm.scaleY);
+    })
 
     // The player and its settings
     player = game.add.sprite(32, game.world.height - 150, 'dude');
