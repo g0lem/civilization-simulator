@@ -76,9 +76,9 @@ function create() {
     game.physics.arcade.enable(player);
 
     //  Player physics properties. Give the little guy a slight bounce.
-    player.body.bounce.y = 0.2;
-    player.body.gravity.y = 300;
-    player.body.collideWorldBounds = true;
+    // player.body.bounce.y = 0.2;
+    // player.body.gravity.y = 300;
+    // player.body.collideWorldBounds = true;
 
     //  Our two animations, walking left and right.
     player.animations.add('left', [0, 1, 2, 3], 10, true);
@@ -97,7 +97,7 @@ function create() {
         var star = stars.create(i * 70, 0, 'star');
 
         //  Let gravity do its thing
-        star.body.gravity.y = 300;
+        // star.body.gravity.y = 300;
 
         //  This just gives each star a slightly random bounce value
         star.body.bounce.y = 0.7 + Math.random() * 0.2;
@@ -122,6 +122,11 @@ function update() {
 
     //  Reset the players velocity (movement)
     player.body.velocity.x = 0;
+    player.body.velocity.y = 0;
+
+    player.animations.stop();
+
+    player.frame = 4;
 
     if (cursors.left.isDown)
     {
@@ -130,27 +135,24 @@ function update() {
 
         player.animations.play('left');
     }
-    else if (cursors.right.isDown)
+    if (cursors.right.isDown)
     {
         //  Move to the right
         player.body.velocity.x = 150;
 
         player.animations.play('right');
     }
-    else
+    //  Allow the player to jump if they are touching the ground.
+    if (cursors.up.isDown)
     {
-        //  Stand still
-        player.animations.stop();
+        player.body.velocity.y = -150;
+    }
 
-        player.frame = 4;
+    if (cursors.down.isDown)
+    {
+        player.body.velocity.y = 150;
     }
     
-    //  Allow the player to jump if they are touching the ground.
-    if (cursors.up.isDown && player.body.touching.down)
-    {
-        player.body.velocity.y = -350;
-    }
-
 }
 
 function collectStar (player, star) {
