@@ -12,6 +12,10 @@ const textures = [
         name: 'star',
         location: 'assets/star.png',
     },
+    {
+        name: 'cross',
+        location: 'assets/cross.png',
+    },
 ];
 
 

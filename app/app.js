@@ -10,6 +10,8 @@ import env from './env';
 import world from './world_data/world';
 import textures from './world_data/textures';
 import spritesheets from './world_data/spritesheets';
+import Pointer from './src/Pointer';
+import Player from './src/Player';
 
 
 console.log('Loaded environment variables:', env);
@@ -44,6 +46,8 @@ var cursors;
 var stars;
 var score = 0;
 var scoreText;
+
+var pointer;
 
 function create() {
 
@@ -82,19 +86,7 @@ function create() {
     })
 
     // The player and its settings
-    player = game.add.sprite(32, game.world.height - 150, 'dude');
-
-    //  We need to enable physics on the player
-    game.physics.arcade.enable(player);
-
-    //  Player physics properties. Give the little guy a slight bounce.
-    // player.body.bounce.y = 0.2;
-    // player.body.gravity.y = 300;
-    // player.body.collideWorldBounds = true;
-
-    //  Our two animations, walking left and right.
-    player.animations.add('left', [0, 1, 2, 3], 10, true);
-    player.animations.add('right', [5, 6, 7, 8], 10, true);
+    player = Player(game);
 
     //  Finally some stars to collect
     stars = game.add.group();
@@ -121,48 +113,52 @@ function create() {
     //  Our controls.
     cursors = game.input.keyboard.createCursorKeys();
     
+
+    pointer = Pointer(game, player);
 }
+
 
 function update() {
 
     //  Collide the player and the stars with the platforms
-    game.physics.arcade.collide(player, platforms);
+    game.physics.arcade.collide(player.getPlayer(), platforms);
     game.physics.arcade.collide(stars, platforms);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
 
     //  Reset the players velocity (movement)
-    player.body.velocity.x = 0;
-    player.body.velocity.y = 0;
 
-    player.animations.stop();
 
-    player.frame = 4;
-
-    if (cursors.left.isDown)
+    if (game.input.mousePointer.rightButton.isDown)
     {
-        //  Move to the left
-        player.body.velocity.x = -150;
-
-        player.animations.play('left');
-    }
-    if (cursors.right.isDown)
-    {
-        //  Move to the right
-        player.body.velocity.x = 150;
-
-        player.animations.play('right');
-    }
-    //  Allow the player to jump if they are touching the ground.
-    if (cursors.up.isDown)
-    {
-        player.body.velocity.y = -150;
+        pointer.createPointer(game.input.mousePointer);
     }
 
-    if (cursors.down.isDown)
-    {
-        player.body.velocity.y = 150;
+    if(!pointer.getPointer()){
+        player.stopPlayer();
+        if (cursors.left.isDown)
+        {
+            player.moveLeft();
+        }
+        if (cursors.right.isDown)
+        {
+            player.moveRight();
+        }
+        //  Allow the player to jump if they are touching the ground.
+        if (cursors.up.isDown)
+        {
+            player.moveUp();
+        }
+    
+        if (cursors.down.isDown)
+        {
+            player.moveDown();
+        }
+    }
+    else {
+        game.physics.arcade.moveToObject(player.getPlayer(), pointer.getPointer(), 150);
+        game.physics.arcade.overlap(player.getPlayer(), pointer.getPointerGroup(), pointer.getToPointer, null, this);
     }
     
 }
@@ -177,4 +173,5 @@ function collectStar (player, star) {
     scoreText.text = 'Score: ' + score;
 
 }
+
 });
