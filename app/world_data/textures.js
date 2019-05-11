@@ -6,7 +6,7 @@ const textures = [
     },
     {
         name: 'ground',
-        location: 'assets/mc_textures/cobblestone.png',
+        location: 'assets/cobblestone.png',
     },
     {
         name: 'star',
